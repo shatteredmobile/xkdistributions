@@ -8,82 +8,114 @@
 <title>XK Distribution Stock List</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a wholesale stock sheet — company masthead, sticky search + category bar, category-grouped rows with right-aligned tabular quantities. */
+/* Layout: a distributor's printed stock sheet. Letterhead, one plain filter row, then a single table grouped by category. */
 :root{
-  --bg:#f3f5f8; --panel:#ffffff; --ink:#15202b; --muted:#5b6876; --line:#dfe4ea; --line2:#c9d1da;
-  --accent:#1f4e78; --accent-ink:#ffffff; --accent-soft:#e3ecf5; --ok:#1d7a46; --low:#9a5b00;
-  --f-display:"Archivo","Arial Narrow",Arial,sans-serif; --f-body:"IBM Plex Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --paper:#ffffff; --ink:#1c2126; --muted:#5d6670; --rule:#d8dce1; --band:#eef0f2; --stripe:#f7f8f9;
+  --mark:#1f5c3f; --low:#9a4f00;
+  --f-head:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e141b; --panel:#151d26; --ink:#e6ebf1; --muted:#93a1b0; --line:#243140; --line2:#30404f;
-  --accent:#7fb2e0; --accent-ink:#0b1622; --accent-soft:#1a2b3c; --ok:#5ccb8a; --low:#e5ad55; color-scheme:dark }}
+  --paper:#14171a; --ink:#e4e7ea; --muted:#99a2ab; --rule:#2c3238; --band:#1d2226; --stripe:#181c1f;
+  --mark:#7cc49d; --low:#e0a35c; color-scheme:dark }}
 :root[data-theme="dark"]{
-  --bg:#0e141b; --panel:#151d26; --ink:#e6ebf1; --muted:#93a1b0; --line:#243140; --line2:#30404f;
-  --accent:#7fb2e0; --accent-ink:#0b1622; --accent-soft:#1a2b3c; --ok:#5ccb8a; --low:#e5ad55; color-scheme:dark }
+  --paper:#14171a; --ink:#e4e7ea; --muted:#99a2ab; --rule:#2c3238; --band:#1d2226; --stripe:#181c1f;
+  --mark:#7cc49d; --low:#e0a35c; color-scheme:dark }
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-body)}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header.mast{padding-block:28px 18px;display:grid;grid-template-columns:1fr auto;gap:14px 24px;align-items:end}
-.co{font:700 13px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-h1{font:800 clamp(30px,6vw,46px)/1.02 var(--f-display);font-stretch:82%;margin:8px 0 0;letter-spacing:-.01em;text-wrap:balance}
-.sub{color:var(--muted);margin-top:8px;max-width:56ch}
-.contact{display:flex;flex-direction:column;gap:6px;align-items:flex-end;font-size:14px}
-.contact .ln{display:flex;gap:8px;align-items:center}
-.contact .v{font-family:var(--f-mono);user-select:all}
-.copy{font:500 12px var(--f-body);background:transparent;color:var(--accent);border:1px solid var(--line2);border-radius:6px;padding:2px 8px;cursor:pointer}
-.copy:hover{border-color:var(--accent)}
-.copy:focus-visible,.chip:focus-visible,#q:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.stats{display:flex;gap:22px;flex-wrap:wrap;padding-block:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.stat b{display:block;font:700 22px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
-.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;display:flex;flex-direction:column;gap:10px}
-#q{width:100%;font:16px var(--f-body);padding:11px 14px;border:1px solid var(--line2);border-radius:10px;background:var(--panel);color:var(--ink)}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
-.chip{flex:0 0 auto;font:500 13px var(--f-body);padding:6px 12px;border-radius:999px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);cursor:pointer;white-space:nowrap}
-.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.chip small{opacity:.7;margin-left:4px;font-variant-numeric:tabular-nums}
-section.cat{margin-top:18px}
-.cat h2{font:700 15px/1 var(--f-display);font-stretch:90%;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
-.cat h2 span{font:500 12px var(--f-body);letter-spacing:0;text-transform:none;color:var(--muted)}
-.list{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:center;padding:11px 14px;border-top:1px solid var(--line)}
-.row:first-child{border-top:none}
-.nm{font-weight:500;min-width:0;overflow-wrap:anywhere}
-.upc{font:12px var(--f-mono);color:var(--muted);margin-top:2px}
-.qty{text-align:right;font:600 17px var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-.qty small{display:block;font:500 11px var(--f-body);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
-.qty.low{color:var(--low)}
-.empty{padding:40px 16px;text-align:center;color:var(--muted)}
-footer{padding-block:28px 40px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:6px}
-@media (max-width:620px){header.mast{grid-template-columns:1fr}.contact{align-items:flex-start}}
-@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+body{background:var(--paper);color:var(--ink);font:15px/1.45 var(--f-body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+
+.letterhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 32px;padding-block:28px 16px;border-bottom:3px solid var(--ink)}
+.firm{min-width:0}
+.firm h1{margin:0;font:800 26px/1.1 var(--f-head);letter-spacing:.01em;text-transform:uppercase}
+.firm p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.contact{font-size:14px;line-height:1.6;text-align:right}
+.contact span{user-select:all}
+.contact .num{font-family:var(--f-num);font-size:13.5px}
+
+.sheet-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 24px;padding-block:18px 4px}
+.sheet-head h2{margin:0;font:700 19px/1.2 var(--f-head)}
+.asof{color:var(--muted);font-size:13.5px}
+.terms{margin:4px 0 0;color:var(--muted);font-size:14px;max-width:62ch}
+
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding-block:14px 10px;border-bottom:1px solid var(--rule)}
+.filters label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#q{flex:1 1 260px;min-width:0;font:15px var(--f-body);padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:var(--paper);color:var(--ink)}
+#cat{flex:0 1 220px;min-width:0;font:15px var(--f-body);padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:var(--paper);color:var(--ink)}
+#q:focus-visible,#cat:focus-visible{outline:2px solid var(--mark);outline-offset:1px;border-color:var(--mark)}
+.count{color:var(--muted);font-size:13.5px;white-space:nowrap}
+
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:6px}
+thead th{font:600 12px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 8px;border-bottom:1px solid var(--rule);white-space:nowrap}
+thead th.r,td.r{text-align:right}
+tbody.grp th{background:var(--band);text-align:left;font:700 13.5px/1.2 var(--f-head);padding:9px 8px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+tbody.grp th small{font:400 12.5px var(--f-body);color:var(--muted);margin-left:8px}
+td{padding:8px;border-bottom:1px solid var(--rule);vertical-align:baseline}
+tbody tr.item:nth-child(odd) td{background:var(--stripe)}
+td.nm{min-width:0;overflow-wrap:anywhere}
+td.upc{font:13px var(--f-num);color:var(--muted);white-space:nowrap}
+td.q{font:500 15px var(--f-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.q.low{color:var(--low)}
+td.q.low::after{content:" low";font:500 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em}
+.m-upc{display:none}
+.empty{padding:32px 8px;color:var(--muted)}
+
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px}
+
+@media (max-width:600px){
+  .contact{text-align:left}
+  .firm h1{font-size:22px}
+  th.upc,td.upc{display:none}
+  #cat{flex:1 1 100%}
+  .m-upc{display:block;font:12px var(--f-num);color:var(--muted);margin-top:2px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="mast">
-    <div>
-      <div class="co">XK Distribution LLC</div>
-      <h1>Available stock</h1>
-      <div class="sub">What we have on hand right now. Quantities change through the day, so contact us to confirm and place an order.</div>
+  <header class="letterhead">
+    <div class="firm">
+      <h1>XK Distribution LLC</h1>
+      <p>Wholesale consumer electronics · Chesapeake, Virginia</p>
     </div>
-    <div class="contact" aria-label="Contact">
-      <div class="ln"><span class="v" id="ph">(646) 204-4114</span><button class="copy" type="button" data-copy="ph">Copy</button></div>
-      <div class="ln"><span class="v" id="em">xxkdistribution@gmail.com</span><button class="copy" type="button" data-copy="em">Copy</button></div>
+    <div class="contact">
+      <div><span class="num">(646) 204-4114</span></div>
+      <div><span>xxkdistribution@gmail.com</span></div>
     </div>
   </header>
-  <div class="stats" id="stats"></div>
-  <div class="bar">
-    <input id="q" type="search" placeholder="Search a product or scan a UPC" autocomplete="off" aria-label="Search products">
-    <div class="chips" id="chips" role="toolbar" aria-label="Categories"></div>
+
+  <section>
+    <div class="sheet-head">
+      <h2>Stock on hand</h2>
+      <div class="asof" id="asof"></div>
+    </div>
+    <p class="terms">Wholesale only. Quantities change through the day, so call or email to confirm availability and get pricing.</p>
+  </section>
+
+  <div class="filters">
+    <label for="q">Search</label>
+    <input id="q" type="search" placeholder="Search by name or UPC" autocomplete="off">
+    <label for="cat">Category</label>
+    <select id="cat"><option value="">All categories</option></select>
+    <span class="count" id="count"></span>
   </div>
-  <main id="out"></main>
+
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Item</th><th class="upc">UPC</th><th class="r">On hand</th></tr></thead>
+      <tbody id="none" hidden><tr><td colspan="3" class="empty" id="emptymsg"></td></tr></tbody>
+    </table>
+  </div>
+
   <footer>
-    <div id="upd"></div>
-    <div>XK Distribution LLC · 1200 Battlefield Blvd N Suite 101, Chesapeake, VA 23320</div>
+    <div>XK Distribution LLC · 1200 Battlefield Blvd N, Suite 101, Chesapeake, VA 23320</div>
+    <div>(646) 204-4114</div>
   </footer>
 </div>
 
@@ -92,54 +124,49 @@ footer{padding-block:28px 40px;color:var(--muted);font-size:13px;display:flex;fl
 (function(){
   var data={items:[],updated:null};
   try{ data=JSON.parse(document.getElementById('stock-data').textContent); }catch(e){}
-  var items=data.items||[]; var cat='', q='';
-  try{ cat=localStorage.getItem('xk-cat')||''; }catch(e){}
+  var items=data.items||[];
   var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
   var norm=function(s){return String(s||'').toLowerCase().replace(/\+/g,'plus').replace(/[^a-z0-9]/g,'');};
   var cats={}; items.forEach(function(i){cats[i.c]=(cats[i.c]||0)+1;});
   var catNames=Object.keys(cats).sort();
-  if(cat && !cats[cat]) cat='';
-  var units=items.reduce(function(a,i){return a+i.q;},0);
-  document.getElementById('stats').innerHTML=
-    '<div class="stat"><b>'+items.length.toLocaleString()+'</b><span>Products in stock</span></div>'+
-    '<div class="stat"><b>'+units.toLocaleString()+'</b><span>Units on hand</span></div>'+
-    '<div class="stat"><b>'+catNames.length+'</b><span>Categories</span></div>';
-  if(data.updated){ var d=new Date(data.updated); document.getElementById('upd').textContent='Last updated '+d.toLocaleString(undefined,{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}); }
-  function chips(){
-    var h='<button class="chip" type="button" data-c="" aria-pressed="'+(cat===''?'true':'false')+'">All<small>'+items.length+'</small></button>';
-    catNames.forEach(function(c){ h+='<button class="chip" type="button" data-c="'+esc(c)+'" aria-pressed="'+(cat===c?'true':'false')+'">'+esc(c)+'<small>'+cats[c]+'</small></button>'; });
-    document.getElementById('chips').innerHTML=h;
+  var sel=document.getElementById('cat'), q=document.getElementById('q');
+  catNames.forEach(function(c){ var o=document.createElement('option'); o.value=c; o.textContent=c+' ('+cats[c]+')'; sel.appendChild(o); });
+  try{ var saved=localStorage.getItem('xk-cat'); if(saved && cats[saved]) sel.value=saved; }catch(e){}
+  if(data.updated){
+    var d=new Date(data.updated);
+    if(!isNaN(d)) document.getElementById('asof').textContent='Updated '+d.toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'})+' ET';
   }
+  var table=document.querySelector('table');
   function render(){
-    var nq=norm(q), dq=q.replace(/\D/g,'').replace(/^0+/,'');
+    var nq=norm(q.value), dq=q.value.replace(/\D/g,'').replace(/^0+/,''), cat=sel.value;
     var rows=items.filter(function(i){
       if(cat && i.c!==cat) return false;
       if(!nq) return true;
-      if(norm(i.n).indexOf(nq)>=0 || norm(i.c).indexOf(nq)>=0) return true;
+      if(norm(i.n).indexOf(nq)>=0) return true;
       return dq.length>=4 && (i.u||[]).some(function(u){return u.replace(/^0+/,'').indexOf(dq)>=0;});
     });
+    table.querySelectorAll('tbody.grp, tbody.list').forEach(function(t){t.remove();});
     var by={}; rows.forEach(function(i){(by[i.c]=by[i.c]||[]).push(i);});
-    var h='';
+    var html='';
     Object.keys(by).sort().forEach(function(c){
-      var list=by[c]; var u=list.reduce(function(a,i){return a+i.q;},0);
-      h+='<section class="cat"><h2>'+esc(c)+'<span>'+list.length+' product'+(list.length>1?'s':'')+' · '+u.toLocaleString()+' units</span></h2><div class="list">';
+      var list=by[c];
+      html+='<tbody class="grp"><tr><th colspan="3">'+esc(c)+'<small>'+list.length+' item'+(list.length>1?'s':'')+'</small></th></tr></tbody><tbody class="list">';
       list.forEach(function(i){
-        h+='<div class="row"><div class="nm">'+esc(i.n)+((i.u&&i.u.length)?'<div class="upc">UPC '+esc(i.u[0])+'</div>':'')+'</div>'+
-           '<div class="qty'+(i.q<=3?' low':'')+'">'+i.q.toLocaleString()+'<small>'+(i.q<=3?'Low stock':'In stock')+'</small></div></div>';
+        var u=(i.u&&i.u.length)?esc(i.u[0]):'';
+        html+='<tr class="item"><td class="nm">'+esc(i.n)+(u?'<span class="m-upc">'+u+'</span>':'')+'</td><td class="upc">'+(u||'—')+'</td><td class="q r'+(i.q<=3?' low':'')+'">'+i.q.toLocaleString('en-US')+'</td></tr>';
       });
-      h+='</div></section>';
+      html+='</tbody>';
     });
-    document.getElementById('out').innerHTML=h || '<div class="empty">'+(items.length?'Nothing matches your search. Try a shorter word, or pick All.':'The stock list is being refreshed. Please check back shortly.')+'</div>';
+    table.insertAdjacentHTML('beforeend',html);
+    var none=document.getElementById('none');
+    none.hidden=rows.length>0;
+    document.getElementById('emptymsg').textContent=items.length?'No items match. Try fewer letters, or choose All categories.':'The stock list is being updated. Please check back shortly.';
+    var units=rows.reduce(function(a,i){return a+i.q;},0);
+    document.getElementById('count').textContent=rows.length+' items · '+units.toLocaleString('en-US')+' units';
   }
-  document.getElementById('chips').addEventListener('click',function(e){var b=e.target.closest('.chip'); if(!b) return; cat=b.getAttribute('data-c'); try{localStorage.setItem('xk-cat',cat);}catch(err){} chips(); render();});
-  document.getElementById('q').addEventListener('input',function(e){q=e.target.value; render();});
-  document.querySelectorAll('.copy').forEach(function(b){ b.addEventListener('click',function(){
-    var el=document.getElementById(b.getAttribute('data-copy')); var t=el.textContent;
-    var done=function(){b.textContent='Copied'; setTimeout(function(){b.textContent='Copy';},1500);};
-    var fallback=function(){ var r=document.createRange(); r.selectNodeContents(el); var s=getSelection(); s.removeAllRanges(); s.addRange(r); };
-    try{ navigator.clipboard.writeText(t).then(done,fallback); }catch(err){ fallback(); }
-  });});
-  chips(); render();
+  sel.addEventListener('change',function(){ try{localStorage.setItem('xk-cat',sel.value);}catch(e){} render(); });
+  q.addEventListener('input',render);
+  render();
 })();
 </script>
 </body>
